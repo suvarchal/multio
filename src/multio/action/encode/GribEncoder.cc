@@ -695,24 +695,24 @@ void setDateAndStatisticalFields(GribEncoder& g, const message::Metadata& in,
 
             // Set endStep to please MARS
             g.setValue("stepUnits", timeUnitCodes(util::TimeUnit::Hour));
-            g.setValue("endStep", util::dateTimeDiffInSeconds(currentDateTime.date, currentDateTime.time,
-                                                              refDateTime.date, refDateTime.time)
-                                      / 3600);
+            auto timeDiffSeconds = util::dateTimeDiffInSeconds(currentDateTime.date, currentDateTime.time,
+                                                              previousDateTime.date, previousDateTime.time);
+            g.setValue("endStep", static_cast<std::int64_t>(timeDiffSeconds / 3600));
         }
         else {
             // No forecast time is used
             g.setValue("stepUnits", timeUnitCodes(util::TimeUnit::Hour));
-            g.setValue("startStep", 0l);
+            g.setValue("startStep", static_cast<std::int64_t>(0));
 
             // Is this really needed on top of setting stepUnits?
             g.setValue("indicatorOfUnitOfTimeRange", timeUnitCodes(util::TimeUnit::Hour));
-            g.setValue("forecastTime", 0l);
+            g.setValue("forecastTime", static_cast<std::int64_t>(0));
 
             // Set endStep to please MARS
             g.setValue("stepUnits", timeUnitCodes(util::TimeUnit::Hour));
-            g.setValue("endStep", util::dateTimeDiffInSeconds(currentDateTime.date, currentDateTime.time,
-                                                              previousDateTime.date, previousDateTime.time)
-                                      / 3600);
+            auto timeDiffSeconds = util::dateTimeDiffInSeconds(currentDateTime.date, currentDateTime.time,
+                                                              previousDateTime.date, previousDateTime.time);
+            g.setValue("endStep", static_cast<std::int64_t>(timeDiffSeconds / 3600));
         }
 
         if (operation && (*operation != "instant")) {
@@ -759,11 +759,11 @@ void setDateAndStatisticalFields(GribEncoder& g, const message::Metadata& in,
             if (*timeIncrement != 0) {
                 withFirstOf(valueSetter(g, "indicatorOfUnitForTimeIncrement"),
                             lookUp<std::int64_t>(md, glossary().indicatorOfUnitForTimeIncrement));
-                g.setValue("timeIncrement", *timeIncrement);
+                g.setValue("timeIncrement", static_cast<std::int64_t>(*timeIncrement));
             }
             else {
-                g.setValue("indicatorOfUnitForTimeIncrement", 255);
-                g.setValue("timeIncrement", 0);
+                g.setValue("indicatorOfUnitForTimeIncrement", static_cast<std::int64_t>(255));
+                g.setValue("timeIncrement", static_cast<std::int64_t>(0));
             }
         }
         else if (const auto sampleIntervalInSeconds = md.getOpt<std::int64_t>(glossary().sampleIntervalInSeconds);

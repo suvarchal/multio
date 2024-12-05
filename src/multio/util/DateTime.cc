@@ -124,7 +124,12 @@ double dateTimeDiffInSeconds(const DateInts& lhsDate, const TimeInts& lhsTime, c
     eckit::DateTime r{eckit::Date{rhsDate.year, rhsDate.month, rhsDate.day}, eckit::Time{0, 0, 0}};
     double rhsSec = (rhsTime.hour * 60 + rhsTime.minute) * 60 + rhsTime.second;
 
-    return (l - r) + (lhsSec - rhsSec);
+    double diffSeconds = (l - r) + (lhsSec - rhsSec);
+    
+    // Check if the result would overflow a 32-bit integer
+    isTimeValueInRange(static_cast<std::int64_t>(diffSeconds));
+    
+    return diffSeconds;
 }
 
 

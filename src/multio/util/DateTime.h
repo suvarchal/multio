@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <limits>
+#include "eckit/exception/Exceptions.h"
 
 namespace multio::util {
 
@@ -100,5 +102,15 @@ double dateTimeDiffInSeconds(const DateInts& lhsDate, const TimeInts& lhsTime, c
                              const TimeInts& rhsTime);
 
 //-----------------------------------------------------------------------------
+
+// Add range checking for time values
+inline bool isTimeValueInRange(std::int64_t seconds) {
+    // Check if the value would overflow a 32-bit integer
+    if (seconds > std::numeric_limits<std::int32_t>::max() || 
+        seconds < std::numeric_limits<std::int32_t>::min()) {
+        throw eckit::UserError("Time value exceeds 32-bit limit. Consider using different time units (hours/days)", Here());
+    }
+    return true;
+}
 
 }  // namespace multio::util
